@@ -1,0 +1,7 @@
+C:\Users\pc\source\repos\DataStructureProject\DataStructureProject\bin\Debug\DataStructureProject.exe.config
+C:\Users\pc\source\repos\DataStructureProject\DataStructureProject\bin\Debug\DataStructureProject.exe
+C:\Users\pc\source\repos\DataStructureProject\DataStructureProject\bin\Debug\DataStructureProject.pdb
+C:\Users\pc\source\repos\DataStructureProject\DataStructureProject\obj\Debug\DataStructureProject.csproj.AssemblyReference.cache
+C:\Users\pc\source\repos\DataStructureProject\DataStructureProject\obj\Debug\DataStructureProject.csproj.CoreCompileInputs.cache
+C:\Users\pc\source\repos\DataStructureProject\DataStructureProject\obj\Debug\DataStructureProject.exe
+C:\Users\pc\source\repos\DataStructureProject\DataStructureProject\obj\Debug\DataStructureProject.pdb
