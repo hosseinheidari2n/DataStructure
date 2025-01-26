@@ -9,9 +9,12 @@ namespace DataStructureProject
 {
     public class LexicalAnalyzer
     {
+        public List<Token> Tokens { get; private set; } = new List<Token>();
+
         private readonly List<(string Type, string Pattern)> tokenDefinitions = new List<(string, string)>
         {
-            ("reservedword", @"\b(int|float|void|return|if|while|cin|cout|include|using|namespace|std|main)\b"),
+            ("reservedword", @"\b(int|float|void|return|if|include|while|cin|cout|using|namespace|std|main)\b"),
+            //("include", @"\b#include\b"),
             ("identifier", @"\b[a-zA-Z_][a-zA-Z0-9_]*\b"),
             ("number", @"\b\d+\b"),
             ("symbol", @"[{}();,<>!=+\-*/]"),
@@ -19,6 +22,7 @@ namespace DataStructureProject
             ("whitespace", @"\s+"),
             ("unknown", @".")
         };
+
 
         public List<Token> Analyze(string input)
         {
@@ -28,7 +32,7 @@ namespace DataStructureProject
             while (position < input.Length)
             {
                 Token token = MatchToken(input, ref position);
-                if (token.Type != "whitespace") // Ignore whitespace tokens
+                if (token.Type != "whitespace")
                 {
                     Tokens.Add(token);
                 }
@@ -110,7 +114,5 @@ namespace DataStructureProject
                 .Select(t => (t.Type, t.Value, t.Hash))
                 .ToList();
         }
-
-        public List<Token> Tokens { get; private set; } = new List<Token>();
     }
 }

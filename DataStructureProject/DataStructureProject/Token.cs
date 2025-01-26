@@ -30,5 +30,15 @@ namespace DataStructureProject
                 return BitConverter.ToInt32(hashBytes, 0);
             }
         }
+
+        public override string ToString()
+        {
+            return $"Type: {Type}, Value: {Value}";
+        }
+
+        //public static implicit operator string(Token v)
+        //{
+        //    return $"Type: {Type}, Value: {Value}";
+        //}
     }
 }

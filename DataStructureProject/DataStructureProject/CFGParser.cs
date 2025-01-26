@@ -6,36 +6,37 @@ namespace DataStructureProject
 {
     public class CFGParser
     {
-        // Rule definition: Non-terminal -> List of Productions
+       
         private readonly Dictionary<string, List<string>> grammar = new Dictionary<string, List<string>>
         {
-             { "Start", new List<string> { "SNM" } },
-             { "S", new List<string> { "#include S", "ϵ" } },
-             { "N", new List<string> { "using namespace std;", "ϵ" } },
-             { "M", new List<string> { "int main(){TV}" } },
-             { "T", new List<string> { "Id T", "L T", "Loop T", "Input T", "Output T", "ϵ" } },
-             { "V", new List<string> { "return 0;", "ϵ" } },
-             { "Id", new List<string> { "int L", "float L" } },
-             { "L", new List<string> { "identifier Assign Z" } },
-             { "Z", new List<string> { ", identifier Assign Z", ";" } },
-             { "Operation", new List<string> { "number P", "identifier P" } },
-             { "P", new List<string> { "O W P", "ϵ" } },
-             { "O", new List<string> { "+", "−", "∗" } },
-             { "W", new List<string> { "number", "identifier" } },
-             { "Assign", new List<string> { "= Operation", "ϵ" } },
-             { "Expression", new List<string> { "Operation K Operation" } },
-             { "K", new List<string> { "==", ">=", "<=", "!=" } },
-             { "Loop", new List<string> { "while(Expression){T}" } },
-             { "Input", new List<string> { "cin >> identifier F;" } },
-             { "F", new List<string> { ">> identifier F", "ϵ" } },
-             { "Output", new List<string> { "cout << CH;" } },
-             { "H", new List<string> { "<< CH", "ϵ" } },
-             { "C", new List<string> { "number", "string", "identifier" } }
+            { "Start", new List<string> { "SNM" } },
+            { "S", new List<string> { "#include S", "ϵ" } },
+            { "N", new List<string> { "using namespace std;", "ϵ" } },
+            { "M", new List<string> { "int main(){TV}" } },
+            { "T", new List<string> { "Id T", "L T", "Loop T", "Input T", "Output T", "ϵ" } },
+            { "V", new List<string> { "return 0;", "ϵ" } },
+            { "Id", new List<string> { "int L", "float L" } },
+            { "L", new List<string> { "identifier Assign Z" } },
+            { "Z", new List<string> { ", identifier Assign Z", ";" } },
+            { "Operation", new List<string> { "number P", "identifier P" } },
+            { "P", new List<string> { "O W P", "ϵ" } },
+            { "O", new List<string> { "+", "−", "∗" } },
+            { "W", new List<string> { "number", "identifier" } },
+            { "Assign", new List<string> { "= Operation", "ϵ" } },
+            { "Expression", new List<string> { "Operation K Operation" } },
+            { "K", new List<string> { "==", ">=", "<=", "!=" } },
+            { "Loop", new List<string> { "while(Expression){T}" } },
+            { "Input", new List<string> { "cin >> identifier F;" } },
+            { "F", new List<string> { ">> identifier F", "ϵ" } },
+            { "Output", new List<string> { "cout << CH;" } },
+            { "H", new List<string> { "<< CH", "ϵ" } },
+            { "C", new List<string> { "number", "string", "identifier" } }
         };
 
         private readonly Dictionary<string, HashSet<string>> firstSets = new Dictionary<string, HashSet<string>>();
         private readonly Dictionary<string, HashSet<string>> followSets = new Dictionary<string, HashSet<string>>();
-        private readonly Dictionary<(string, string), string> parseTable = new Dictionary<(string, string), string>();
+
+        public readonly Dictionary<string, Dictionary<string, string>> parseTable = new Dictionary<string, Dictionary<string, string>>();
 
         public void ComputeFirstSets()
         {
@@ -57,13 +58,13 @@ namespace DataStructureProject
 
                         foreach (var symbol in symbols)
                         {
-                            if (!grammar.ContainsKey(symbol)) // Terminal
+                            if (!grammar.ContainsKey(symbol))
                             {
                                 if (firstSets[nonTerminal].Add(symbol))
                                     updated = true;
                                 break;
                             }
-                            else // Non-terminal
+                            else
                             {
                                 var currentFirst = firstSets[symbol].Where(s => s != "ϵ").ToHashSet();
                                 if (currentFirst.Any(s => firstSets[nonTerminal].Add(s)))
@@ -90,7 +91,7 @@ namespace DataStructureProject
             {
                 updated = false;
 
-                foreach (var kvp in grammar)    
+                foreach (var kvp in grammar)
                 {
                     var nonTerminal = kvp.Key;
                     var productions = kvp.Value;
@@ -104,11 +105,11 @@ namespace DataStructureProject
 
                             var follow = followSets[symbols[i]];
 
-                            // Add First of the rest of the production
+                            
                             for (int j = i + 1; j < symbols.Length; j++)
                             {
                                 var nextSymbol = symbols[j];
-                                if (!grammar.ContainsKey(nextSymbol)) // Terminal
+                                if (!grammar.ContainsKey(nextSymbol))
                                 {
                                     if (follow.Add(nextSymbol))
                                         updated = true;
@@ -125,7 +126,6 @@ namespace DataStructureProject
                                 }
                             }
 
-                            // Add Follow of current non-terminal if rest contains ϵ
                             if (i == symbols.Length - 1 || symbols.Skip(i + 1).All(s => grammar.ContainsKey(s) && firstSets[s].Contains("ϵ")))
                             {
                                 foreach (var f in followSets[nonTerminal])
@@ -146,6 +146,12 @@ namespace DataStructureProject
             {
                 var nonTerminal = kvp.Key;
                 var productions = kvp.Value;
+
+                if (!parseTable.ContainsKey(nonTerminal))
+                {
+                    parseTable[nonTerminal] = new Dictionary<string, string>();
+                }
+
                 foreach (var production in productions)
                 {
                     var first = new HashSet<string>();
@@ -153,7 +159,7 @@ namespace DataStructureProject
 
                     foreach (var symbol in symbols)
                     {
-                        if (!grammar.ContainsKey(symbol)) // Terminal
+                        if (!grammar.ContainsKey(symbol))
                         {
                             first.Add(symbol);
                             break;
@@ -174,11 +180,11 @@ namespace DataStructureProject
                         if (terminal == "ϵ")
                         {
                             foreach (var follow in followSets[nonTerminal])
-                                parseTable[(nonTerminal, follow)] = production;
+                                parseTable[nonTerminal][follow] = production;
                         }
                         else
                         {
-                            parseTable[(nonTerminal, terminal)] = production;
+                            parseTable[nonTerminal][terminal] = production;
                         }
                     }
                 }
@@ -192,11 +198,13 @@ namespace DataStructureProject
             Console.WriteLine("| Non-Terminal      | Terminal          | Production            |");
             Console.WriteLine("+-------------------+-------------------+-----------------------+");
 
-            foreach (var entry in parseTable)
+            foreach (var nonTerminal in parseTable)
             {
-                var (nonTerminal, terminal) = entry.Key;
-                string production = entry.Value;
-                Console.WriteLine($"| {nonTerminal,-17} | {terminal,-17} | {production,-21} |");
+                foreach (var terminal in nonTerminal.Value)
+                {
+                    string production = terminal.Value;
+                    Console.WriteLine($"| {nonTerminal.Key,-17} | {terminal.Key,-17} | {production,-21} |");
+                }
             }
 
             Console.WriteLine("+-------------------+-------------------+-----------------------+");
