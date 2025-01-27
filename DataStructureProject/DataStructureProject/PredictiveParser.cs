@@ -38,11 +38,11 @@ namespace DataStructureProject
                 string currentToken = tokens[index].Value;
                 string currToken = tokens[index].Type;
 
-                // Match terminal or end-of-input marker
+               
                 if (top == currentToken || currToken == top)
                 {
                     parsingStack.Pop();
-                    index++;  // Move to the next token
+                    index++;
                     continue;
                 }
 
@@ -54,7 +54,14 @@ namespace DataStructureProject
 
                     if (production != "epsilon")
                     {
-                        Console.WriteLine($"{top} -> {production}");
+                        if (production == "identifier" || production == "number" || production == "string")
+                        {
+                            Console.WriteLine($"{top} -> {currentToken}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{top} -> {production}");
+                        }
 
                         var symbols = production.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -78,7 +85,15 @@ namespace DataStructureProject
 
                     if (production != "epsilon")
                     {
-                        Console.WriteLine($"{top} -> {production}");
+                        if (production == "identifier" || production == "number" || production == "string")
+                        {
+                            Console.WriteLine($"{top} -> {currentToken}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{top} -> {production}");
+                        }
+                        
 
                         var symbols = production.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 

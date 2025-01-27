@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace DataStructureProject
 {
     class Program
     {
+        [STAThread]
         static void Main(string[] args)
         {
             Console.WriteLine("Enter your C++ code (end input with an empty line):");
@@ -137,6 +139,9 @@ namespace DataStructureProject
 
             PredictiveParser parser1 = new PredictiveParser(parsingTable, tokens);
             parser1.ParseInput();
+
+            var parseTree = new ParseTree();
+            parseTree.GenerateParseTree(tokens, parsingTable);
 
             Console.ReadKey();
         }
