@@ -20,7 +20,6 @@ namespace DataStructureProject
             Hash = GetHash(value);
         }
 
-        // Calculate Hash
         private int GetHash(string value)
         {
             using (var sha256 = SHA256.Create())
@@ -35,10 +34,5 @@ namespace DataStructureProject
         {
             return $"Type: {Type}, Value: {Value}";
         }
-
-        //public static implicit operator string(Token v)
-        //{
-        //    return $"Type: {Type}, Value: {Value}";
-        //}
     }
 }

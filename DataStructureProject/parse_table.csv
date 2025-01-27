@@ -1,6 +1,6 @@
-non-Terminal,include,using namespace std;,int main(),int,float,while,cin,cout,identifier,number,+,-,*,",",;,=,,>=,<=,!=,>>,<<,string
+non-Terminal,#include,using namespace std;,int main(),int,float,while,cin,cout,identifier,number,+,-,*,",",;,=,,>=,<=,!=,>>,<<,string
 Start,Start -> SNM,,,,,,,,,,,,,,,,,,,,,,
-S,S -> include S,,,,,,,,,,,,,,,,,,,,,,
+S,S -> #include S,,,,,,,,,,,,,,,,,,,,,,
 N,,N -> using namespace std;,,,,,,,,,,,,,,,,,,,,,
 M,,,M -> int main(){T V},,,,,,,,,,,,,,,,,,,,
 T,,,,T -> Id T,T -> Id T,T -> Loop,T -> Input,T -> Output,T -> Id T,,,,,,,,,,,,,,

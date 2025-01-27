@@ -60,6 +60,8 @@ namespace DataStructureProject
 
             //--------------------------------------------------------------------------------
 
+            // Make First , Follow and ParseTable
+
             var parser = new CFGParser();
 
             parser.ComputeFirstSets();
@@ -72,327 +74,69 @@ namespace DataStructureProject
 
             //-----------------------------------------------------------------------------------
 
-             string parseTablePath = "C:\\Users\\pc\\Desktop\\New folder\\parse_table.csv";
+            string parseTablePath = "C:\\Users\\pc\\Desktop\\New folder\\parse_table.csv";
 
-             Dictionary<string, Dictionary<string, string>> parseTable1 = LoadParseTable(parseTablePath);
+            Dictionary<string, Dictionary<string, string>> parseTable1 = LoadParseTable(parseTablePath);
+            Dictionary<string, Dictionary<string, string>> parsingTable = new Dictionary<string, Dictionary<string, string>>();
 
-            var parseTable2 = new Dictionary<string, Dictionary<string, string>>
+            parsingTable["Start"] = new Dictionary<string, string> { { "#include", "S N M" } };
+            parsingTable["S"] = new Dictionary<string, string> { { "#include", "#include S" }, { "using", "epsilon" } };
+            parsingTable["N"] = new Dictionary<string, string> { { "using", "using namespace std ;" }, { "int", "epsilon" } };
+            parsingTable["M"] = new Dictionary<string, string> { { "int", "int main ( ) { T V }" }, { "using", "epsilon" } };
+            parsingTable["T"] = new Dictionary<string, string>
             {
-                            { "Start", new Dictionary<string, string>
-        {
-            { "include", "Start -> SNM" }, 
-            { "using namespace std;", "" },
-            { "int main()", "" },
-            { "int", "" },
-            { "float", "" },
-            { "while", "" },
-            { "cin", "" },
-            { "cout", "" },
-            { "identifier", "" },
-            { "number", "" },
-            { "+", "" },
-            { "-", "" },
-            { "*", "" },
-            { ",", "" },
-            { ";", "" },
-            { "=", "" },
-            { "==", "" },
-            { ">=", "" },
-            { "<=", "" },
-            { "!=", "" },
-            { ">>", "" },
-            { "<<", "" },
-            { "string", "" }
-        }
-    },
-                { "S", new Dictionary<string, string>
-        {
-            { "include", "S -> include S" },
-            { "using namespace std;", "" },
-            { "int main()", "" },
-            { "int", "" },
-            { "float", "" },
-            { "while", "" },
-            { "cin", "" },
-            { "cout", "" },
-            { "identifier", "" },
-            { "number", "" },
-            { "+", "" },
-            { "-", "" },
-            { "*", "" },
-            { ",", "" },
-            { ";", "" },
-            { "=", "" },
-            { "==", "" },
-            { ">=", "" },
-            { "<=", "" },
-            { "!=", "" },
-            { ">>", "" },
-            { "<<", "" },
-            { "string", "" }
-        }
-    },
-                { "N", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "N -> using namespace std;" },
-                        { "int main()", "" },
-                        { "int", "" },
-                        { "float", "" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "" },
-                        { "number", "" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "" },
-                        { ";", "" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "M", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "M -> int main(){T V}" },
-                        { "int", "" },
-                        { "float", "" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "" },
-                        { "number", "" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "" },
-                        { ";", "" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "T", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "" },
-                        { "int", "T -> Id T" },
-                        { "float", "T -> Id T" },
-                        { "while", "T -> Loop" },
-                        { "cin", "T -> Input" },
-                        { "cout", "T -> Output" },
-                        { "identifier", "T -> Id T" },
-                        { "number", "" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "" },
-                        { ";", "" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "V", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "" },
-                        { "int", "" },
-                        { "float", "" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "" },
-                        { "number", "" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "" },
-                        { ";", "V -> return 0;" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "Id", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "" },
-                        { "int", "Id -> int L" },
-                        { "float", "Id -> float L" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "" },
-                        { "number", "" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "" },
-                        { ";", "" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "L", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "" },
-                        { "int", "" },
-                        { "float", "" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "L -> identifier Assign Z" },
-                        { "number", "" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "L -> identifier Assign Z" },
-                        { ";", "L -> identifier Assign Z" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "Z", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "" },
-                        { "int", "" },
-                        { "float", "" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "" },
-                        { "number", "" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "Z -> , identifier Assign Z" },
-                        { ";", "Z -> ;" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "Operation", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "" },
-                        { "int", "" },
-                        { "float", "" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "Operation -> identifier P" },
-                        { "number", "Operation -> number P" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "" },
-                        { ";", "" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "P", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "" },
-                        { "int", "" },
-                        { "float", "" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "P -> O W P" },
-                        { "number", "P -> O W P" },
-                        { "+", "" },
-                        { "-", "" },
-                        { "*", "" },
-                        { ",", "" },
-                        { ";", "" },
-                        { "=", "" },
-                        { "==", "" },
-                        { ">=", "" },
-                        { "<=", "" },
-                        { "!=", "" },
-                        { ">>", "" },
-                        { "<<", "" },
-                        { "string", "" }
-                    }
-                },
-                { "O", new Dictionary<string, string>
-                    {
-                        { "#include", "" },
-                        { "using namespace std;", "" },
-                        { "int main()", "" },
-                        { "int", "" },
-                        { "float", "" },
-                        { "while", "" },
-                        { "cin", "" },
-                        { "cout", "" },
-                        { "identifier", "" },
-                    }
-                }
+                { "int", "Id T" },
+                { "float", "L T" },
+                { "while", "Loop T" },
+                { "cin", "Input T" },
+                { "cout", "Output T" },
+                { "epsilon", "epsilon" },
+                { "identifier", "L T" },
+                { "}", "epsilon" },
+                { "return", "epsilon" }
             };
-            CFGParser p = new CFGParser();
 
-            PredictiveParser parser1 = new PredictiveParser(parseTable1, tokens);
-            parser1.Parse();
+            parsingTable["V"] = new Dictionary<string, string> { { "return", "return 0 ;" }, { "epsilon", "epsilon" } };
+            parsingTable["Id"] = new Dictionary<string, string> { { "int", "int L" }, { "float", "float L" } };
+            parsingTable["L"] = new Dictionary<string, string> { { "identifier", "identifier Assign Z" } };
+            parsingTable["Z"] = new Dictionary<string, string> { { ",", ", identifier Assign Z" }, { ";", ";" } };
+            parsingTable["Assign"] = new Dictionary<string, string> { { "=", "= Operation" }, { "epsilon", "epsilon" }, { ";", "epsilon" } };
+            parsingTable["Operation"] = new Dictionary<string, string> { { "number", "number P" }, { "identifier", "identifier P" } };
+            parsingTable["P"] = new Dictionary<string, string>
+            {
+                { "+", "O W P" },
+                { "-", "O W P" },
+                { "*", "O W P" },
+                { ",", "epsilon" },
+                { ";", "epsilon" },
+                { ">=", "epsilon" },
+                { "<=", "epsilon" },
+                { "==", "epsilon" },
+                { ")", "epsilon" },
+                { "epsilon", "epsilon" }
+            };
+
+            parsingTable["O"] = new Dictionary<string, string> { { "+", "+" }, { "-", "-" }, { "*", "*" } };
+            parsingTable["W"] = new Dictionary<string, string> { { "number", "number" }, { "identifier", "identifier" } };
+            parsingTable["Expression"] = new Dictionary<string, string> { { "number", "Operation K Operation" }, { "identifier", "Operation K Operation" } };
+            parsingTable["K"] = new Dictionary<string, string>
+            {
+                { "==", "==" },
+                { ">=", ">=" },
+                { ">", ">=" },
+                { "<=", "<=" },
+                { "!=", "!=" }
+            };
+
+            parsingTable["Loop"] = new Dictionary<string, string> { { "while", "while ( Expression ) { T }" } };
+            parsingTable["Input"] = new Dictionary<string, string> { { "cin", "cin >> identifier F ;" } };
+            parsingTable["F"] = new Dictionary<string, string> { { ">>", ">> identifier F" }, { "epsilon", "epsilon" }, { ";", "epsilon" } };
+            parsingTable["Output"] = new Dictionary<string, string> { { "cout", "cout << C H ;" } };
+            parsingTable["H"] = new Dictionary<string, string> { { "<<", "<< C H" }, { "epsilon", "epsilon" }, { ";", "epsilon" } };
+            parsingTable["C"] = new Dictionary<string, string> { { "number", "number" }, { "string", "string" }, { "identifier", "identifier" } };
+
+            PredictiveParser parser1 = new PredictiveParser(parsingTable, tokens);
+            parser1.ParseInput();
 
             Console.ReadKey();
         }

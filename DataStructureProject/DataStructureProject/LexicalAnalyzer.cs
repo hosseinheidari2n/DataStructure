@@ -11,19 +11,6 @@ namespace DataStructureProject
     {
         public List<Token> Tokens { get; private set; } = new List<Token>();
 
-        private readonly List<(string Type, string Pattern)> tokenDefinitions = new List<(string, string)>
-        {
-            ("reservedword", @"\b(int|float|void|return|if|include|while|cin|cout|using|namespace|std|main)\b"),
-            //("include", @"\b#include\b"),
-            ("identifier", @"\b[a-zA-Z_][a-zA-Z0-9_]*\b"),
-            ("number", @"\b\d+\b"),
-            ("symbol", @"[{}();,<>!=+\-*/]"),
-            ("string", "\".*?\""),
-            ("whitespace", @"\s+"),
-            ("unknown", @".")
-        };
-
-
         public List<Token> Analyze(string input)
         {
             Tokens.Clear();
@@ -31,33 +18,109 @@ namespace DataStructureProject
 
             while (position < input.Length)
             {
-                Token token = MatchToken(input, ref position);
-                if (token.Type != "whitespace")
+                char current = input[position];
+
+                if (IsWhitespace(current))
                 {
-                    Tokens.Add(token);
+                    position++;
+                    continue;
+                }
+
+                if (IsLetter(current))
+                {
+                    string word = ReadWhile(input, ref position, IsLetterOrDigit);
+                    string type = IsReservedWord(word) ? "reservedword" : "identifier";
+                    Tokens.Add(new Token(type, word));
+                }
+                else if (current == '#' && input.Substring(position).StartsWith("#include"))
+                {
+                    Tokens.Add(new Token("reservedword", "#include"));
+                    position += 8;
+                }
+                else if (IsDigit(current))
+                {
+                    string number = ReadWhile(input, ref position, IsDigit);
+                    Tokens.Add(new Token("number", number));
+                }
+                else if (IsSymbol(current))
+                {
+                    string symbol = current.ToString();
+
+                    if (position + 1 < input.Length)
+                    {
+                        char next = input[position + 1];
+
+
+                        if ((current == '<' || current == '>') && (next == '=' || next == current))
+                        {
+                            symbol += next;
+                            position++;
+                        }
+                    }
+
+                    Tokens.Add(new Token("symbol", symbol));
+                    position++;
+                }
+                else if (current == '"')
+                {
+                    string str = ReadString(input, ref position);
+                    Tokens.Add(new Token("string", str));
+                }
+                else
+                {
+                    Tokens.Add(new Token("unknown", current.ToString()));
+                    position++;
                 }
             }
 
             return Tokens;
         }
 
-        private Token MatchToken(string input, ref int position)
+        private static bool IsLetter(char ch) => char.IsLetter(ch);
+        private static bool IsDigit(char ch) => char.IsDigit(ch);
+        private static bool IsLetterOrDigit(char ch) => char.IsLetterOrDigit(ch) || ch == '_';
+        private static bool IsWhitespace(char ch) => char.IsWhiteSpace(ch);
+
+        private static bool IsReservedWord(string st)
         {
-            foreach (var (type, pattern) in tokenDefinitions)
+            var reservedWords = new HashSet<string>
             {
-                Regex regex = new Regex($"^({pattern})", RegexOptions.Compiled);
-                Match match = regex.Match(input.Substring(position));
-
-                if (match.Success)
-                {
-                    string value = match.Value;
-                    position += value.Length;
-                    return new Token(type, value);
-                }
-            }
-
-            throw new Exception($"Unexpected token at position {position}");
+                 "int", "float", "void", "return", "if", "while", "cin", "cout", "continue",
+                 "break", "using", "iostream", "namespace", "std", "main"
+            };
+            return reservedWords.Contains(st);
         }
+
+        private static bool IsSymbol(char ch)
+        {
+            var symbols = new HashSet<char>
+            {
+                '(', ')', '[', ']', ',', ';', '+', '*', '-', '/', '=', '<', '>', '|', '&', '{', '}'
+            };
+            return symbols.Contains(ch);
+        }
+
+        private static string ReadWhile(string input, ref int position, Func<char, bool> condition)
+        {
+            int start = position;
+            while (position < input.Length && condition(input[position]))
+            {
+                position++;
+            }
+            return input.Substring(start, position - start);
+        }
+
+        private static string ReadString(string input, ref int position)
+        {
+            int start = position++;
+            while (position < input.Length && input[position] != '"')
+            {
+                position++;
+            }
+            position++;
+            return input.Substring(start, position - start);
+        }
+
 
         // Bonus: Find the first declaration
         public string FindFirstDeclaration(List<Token> tokens)
@@ -74,7 +137,6 @@ namespace DataStructureProject
             return null;
         }
 
-        // Bonus: Validate tokens for common errors
         public List<string> ValidateTokens(List<Token> tokens)
         {
             List<string> errors = new List<string>();
@@ -86,15 +148,33 @@ namespace DataStructureProject
                     errors.Add($"Unknown token: {tokens[i].Value}");
                 }
 
-                // Check for missing semicolon
+                // Check for missing semicolon at the end of statements
                 if (tokens[i].Type == "reservedword" &&
-                    tokens[i].Value != "while" && tokens[i].Value != "if" &&
-                    i + 1 < tokens.Count && tokens[i + 1].Value != ";")
+                    (tokens[i].Value == "while" || tokens[i].Value == "if" || tokens[i].Value == "return" || tokens[i].Value == "int" || tokens[i].Value == "float"))
                 {
-                    errors.Add($"Missing semicolon after {tokens[i].Value}");
+                    // Make sure the next token is a semicolon
+                    bool hasSemicolon = false;
+                    int j = i + 1;
+
+                    // Skip over any tokens like identifiers or operators that might be part of the statement
+                    while (j < tokens.Count && tokens[j].Type != "symbol")
+                    {
+                        j++;
+                    }
+
+                    // Check for semicolon at the end of the statement
+                    if (j < tokens.Count && tokens[j].Value == ";")
+                    {
+                        hasSemicolon = true;
+                    }
+
+                    if (!hasSemicolon)
+                    {
+                        errors.Add($"Missing semicolon after '{tokens[i].Value}' statement.");
+                    }
                 }
 
-                // Check for invalid assignment
+                // Check for invalid assignment (ensuring valid operands after assignment operator)
                 if (tokens[i].Type == "identifier" &&
                     i + 2 < tokens.Count && tokens[i + 1].Value == "=" &&
                     tokens[i + 2].Type != "number" && tokens[i + 2].Type != "identifier")
@@ -105,6 +185,7 @@ namespace DataStructureProject
 
             return errors;
         }
+
 
         public List<(string TokenType, string TokenValue, int HashValue)> CreateTokenTable()
         {

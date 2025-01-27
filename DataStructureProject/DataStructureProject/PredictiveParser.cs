@@ -7,134 +7,107 @@ namespace DataStructureProject
 {
     public class PredictiveParser
     {
-        private Dictionary<string, Dictionary<string, string>> parseTable;
-        private Stack<string> parseStack;
+        private Dictionary<string, Dictionary<string, string>> parsingTable;
+        private Stack<string> parsingStack;
         private List<Token> tokens;
 
-        public PredictiveParser(Dictionary<string, Dictionary<string, string>> parseTable, List<Token> tokens)
+        public PredictiveParser(Dictionary<string, Dictionary<string, string>> parsingTable, List<Token> tokens)
         {
-            this.parseTable = parseTable;
+            this.parsingTable = parsingTable;
             this.tokens = tokens;
-            this.parseStack = new Stack<string>();
+            this.parsingStack = new Stack<string>();
         }
 
-        public void Parse()
+        public void ParseInput()
         {
-            //parseStack.Push("$"); // End marker
-            //parseStack.Push("Start"); // Start symbol (replace with your grammar's start symbol)
 
-            //int tokenIndex = 0;
-            //while (parseStack.Count > 0)
-            //{
-            //    string top = parseStack.Peek();
-            //    Token currentToken = tokenIndex < tokens.Count ? tokens[tokenIndex] : new Token("$", "$");
+            parsingStack.Push("Start");
 
-            //    if (top == "$" && currentToken.Type == "$")
-            //    {
-            //        Console.WriteLine("Parsing successful!");
-            //        return;
-            //    }
+            int index = 0;
+            Console.WriteLine("Derivation steps:");
 
-            //    if (IsTerminal(top))
-            //    {
-            //        if (top == currentToken.Value)
-            //        {
-            //            parseStack.Pop();
-            //            tokenIndex++;
-            //        }
-            //        else
-            //        {
-            //            Console.WriteLine($"Syntax error: Expected '{top}', found '{currentToken.Value}'");
-            //            return;
-            //        }
-            //    }
-            //    else if (parseTable.ContainsKey(top) && parseTable[top].ContainsKey(currentToken.Value))
-            //    {
-            //        parseStack.Pop();
-            //        string production = parseTable[top][currentToken.Value];
-
-            //        if (production != "ε") // If not epsilon, push production in reverse order
-            //        {
-            //            foreach (var symbol in production.Split(' ').Reverse())
-            //            {
-            //                parseStack.Push(symbol);
-            //            }
-            //        }
-            //    }
-            //    else
-            //    {
-            //        Console.WriteLine($"Syntax error: No rule for '{top}' with input '{currentToken.Value}'");
-            //        return;
-            //    }
-            //}
-
-            //if (tokenIndex < tokens.Count)
-            //{
-            //    Console.WriteLine("Syntax error: Unexpected tokens remaining.");
-            //}
-
-
-            parseStack = new Stack<string>();
-            parseStack.Push("S"); 
-
-
-            while (parseStack.Count > 0)
+            while (parsingStack.Count > 0)
             {
-                string top = parseStack.Peek();
-                string currentToken = tokens[0].ToString();
-
-                if (IsTerminal(top))
+                if (index >= tokens.Count)
                 {
-                    if (top == currentToken)
-                    {
-                        Console.WriteLine($"Matched: {top}");
-                        parseStack.Pop();
-                        tokens.RemoveAt(0);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Error: Expected {top}, but got {currentToken}");
-                        break;
-                    }
+                    Console.WriteLine("Error: Reached end of tokens without resolving stack.");
+                    return;
                 }
-                else
-                {
-                    if (parseTable.ContainsKey(top) && parseTable[top].ContainsKey(currentToken))
-                    {
-                        string production = parseTable[top][currentToken];
-                        Console.WriteLine($"Applying production: {top} -> {production}");
-                        parseStack.Pop();
 
-                        var productionParts = production.Split(' ');
-                        foreach (var part in productionParts)
+                string top = parsingStack.Peek();
+                string currentToken = tokens[index].Value;
+                string currToken = tokens[index].Type;
+
+                // Match terminal or end-of-input marker
+                if (top == currentToken || currToken == top)
+                {
+                    parsingStack.Pop();
+                    index++;  // Move to the next token
+                    continue;
+                }
+
+                // Handle non-terminal using currentToken
+                if (parsingTable.ContainsKey(top) && parsingTable[top].ContainsKey(currentToken))
+                {
+                    string production = parsingTable[top][currentToken];
+                    parsingStack.Pop();
+
+                    if (production != "epsilon")
+                    {
+                        Console.WriteLine($"{top} -> {production}");
+
+                        var symbols = production.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                        for (int j = symbols.Count - 1; j >= 0; --j)
                         {
-                            if (part != "epsilon")
-                            {
-                                parseStack.Push(part);
-                            }
+                            parsingStack.Push(symbols[j]);
                         }
                     }
                     else
                     {
-                        Console.WriteLine($"Error: No production for {top} with {currentToken}");
-                        break;
+                        Console.WriteLine($"{top} -> epsilon");
                     }
+                    continue;
                 }
+
+                // Handle non-terminal using currToken
+                if (parsingTable.ContainsKey(top) && parsingTable[top].ContainsKey(currToken))
+                {
+                    string production = parsingTable[top][currToken];
+                    parsingStack.Pop();
+
+                    if (production != "epsilon")
+                    {
+                        Console.WriteLine($"{top} -> {production}");
+
+                        var symbols = production.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                        for (int j = symbols.Count - 1; j >= 0; --j)
+                        {
+                            parsingStack.Push(symbols[j]);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{top} -> epsilon");
+                    }
+                    continue;
+                }
+
+                // Error handling: if no match is found
+                Console.WriteLine($"Error: Unexpected token '{currentToken}' at top of stack '{top}'");
+                return;
             }
 
-            if (tokens.Count == 0)
+            // Ensure that we have processed all tokens
+            if (index == tokens.Count)
             {
                 Console.WriteLine("Parsing successful!");
             }
             else
             {
-                Console.WriteLine("Parsing failed.");
+                Console.WriteLine("Parsing failed! Unprocessed tokens left.");
             }
-        }
-
-        private bool IsTerminal(string symbol)
-        {
-            return !parseTable.ContainsKey(symbol);
         }
     }
 }

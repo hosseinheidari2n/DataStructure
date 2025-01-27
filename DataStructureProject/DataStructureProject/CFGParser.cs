@@ -6,7 +6,7 @@ namespace DataStructureProject
 {
     public class CFGParser
     {
-       
+
         private readonly Dictionary<string, List<string>> grammar = new Dictionary<string, List<string>>
         {
             { "Start", new List<string> { "SNM" } },
@@ -105,7 +105,7 @@ namespace DataStructureProject
 
                             var follow = followSets[symbols[i]];
 
-                            
+
                             for (int j = i + 1; j < symbols.Length; j++)
                             {
                                 var nextSymbol = symbols[j];
